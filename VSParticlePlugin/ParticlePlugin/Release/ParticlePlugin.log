@@ -1,0 +1,25 @@
+﻿Build started 1/27/2015 10:09:43 PM.
+     1>Project "C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\ParticlePlugin\ParticlePlugin.vcxproj" on node 2 (build target(s)).
+     1>PrepareForBuild:
+         Creating directory "C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\".
+       InitializeBuildStatus:
+         Creating "Release\ParticlePlugin.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D PARTICLEPLUGIN_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt particle_movement.cpp
+         particle_movement.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\ParticlePlugin.dll" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\ParticlePlugin.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\ParticlePlugin.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\ParticlePlugin.lib" /MACHINE:X86 /DLL Release\particle_movement.obj
+            Creating library C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\ParticlePlugin.lib and object C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\ParticlePlugin.exp
+         Generating code
+         Finished generating code
+         ParticlePlugin.vcxproj -> C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\ParticlePlugin.dll
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\Release\ParticlePlugin.dll;#2" /manifest Release\ParticlePlugin.dll.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Release\ParticlePlugin.unsuccessfulbuild".
+         Touching "Release\ParticlePlugin.lastbuildstate".
+     1>Done Building Project "C:\Users\Admin\boolzhu\TA\cs248\cs248_2015winter\ParticlePlugin\ParticlePlugin\ParticlePlugin.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.60

@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "7dd6edde-8755-4ff7-a91d-3cb075e8d3ac++5684",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "7dd6edde-8755-4ff7-a91d-3cb075e8d3ac++5684" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "7dd6edde-8755-4ff7-a91d-3cb075e8d3ac++5684" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "F35B87FD-22F9-48B7-BCD5-3F8CDA92B4CE",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "7dd6edde-8755-4ff7-a91d-3cb075e8d3ac++5684" : "Courses\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "XCodeParticlePlugin",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "2015\/cs248\/assignment3\/starter_projects\/XCodeParticlePlugin\/XCodeParticlePlugin.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "svn+ssh:\/\/physbam.stanford.edu\/physbam\/physbam_repository",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7dd6edde-8755-4ff7-a91d-3cb075e8d3ac++5684"
+    }
+  ]
+}

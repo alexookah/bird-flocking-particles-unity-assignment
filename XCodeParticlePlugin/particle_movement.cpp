@@ -61,8 +61,9 @@ extern "C"
         for(int d=0;d<3;d++){
             v[d] += a[d] * dt;
         }
+        
         for(int d=0;d<3;d++){
-            x[d]+=v[d]*dt;
+            x[d] += v[d] * dt;
         }
         
         if (bounds_is_circle) {
@@ -81,18 +82,20 @@ extern "C"
             
             float r_2 = dist_X * dist_X + dist_Y * dist_Y + dist_Z * dist_Z;
             
-            if (r_2 > circle_r) {
+            if (r_2 > circle_r * circle_r) {
                 //KROUSI
-                //| {vx, vy, vz} + Α * {x', y', z'} | == | {vx, vy, vz} |
                 
                 double alpha = (v[0] * dist_X + v[1] * dist_Y + v[2] * dist_Z) / (dist_X * dist_X + dist_Y * dist_Y + dist_Z * dist_Z);
                 
                 v[0] -= alpha * dist_X;
                 v[1] -= alpha * dist_Y;
                 v[2] -= alpha * dist_Z;
+                
+                v[0] -= (2 - damping_percentage) * alpha;
+                v[1] -= (2 - damping_percentage) * alpha;
+                v[2] -= (2 - damping_percentage) * alpha;
             }
 
-            
         } else {
             
             float* bounds_low = &bounds[0];
@@ -109,8 +112,6 @@ extern "C"
                 }
             }
         }
-        
-        
     }
     
 } // end of export C block

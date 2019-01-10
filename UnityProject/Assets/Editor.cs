@@ -41,10 +41,22 @@ public class MenuItems
         if (ParticleMotionScript.bounds_is_circle)
         {
             ParticleMotionScript.bounds_is_circle = false;
+            GameObject cube = GameObject.FindWithTag("bounds_cube");
+            cube.SetActive(false);
+
+            GameObject sphere = GameObject.FindWithTag("bounds_sphere");
+            sphere.SetActive(true);
+
         }
         else
         {
             ParticleMotionScript.bounds_is_circle = true;
+
+            GameObject cube = GameObject.FindWithTag("bounds_cube");
+            cube.SetActive(true);
+
+            GameObject sphere = GameObject.FindWithTag("bounds_sphere");
+            sphere.SetActive(false);
         }
     }
 }

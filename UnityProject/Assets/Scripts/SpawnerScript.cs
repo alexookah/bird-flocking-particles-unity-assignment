@@ -36,6 +36,9 @@ public class SpawnerScript : MonoBehaviour {
         number_of_attractors_initialized = 0;
 
         InvokeRepeating("AttractorsSpawn", spawnDelay, spawnTime);
+
+        PostitionCube();
+        PositionSphere();
     }
 	
 	void Spawn ()
@@ -77,9 +80,65 @@ public class SpawnerScript : MonoBehaviour {
         }
     }
 
+    void PositionSphere()
+    {
+        GameObject sphere = GameObject.FindWithTag("bounds_sphere");
+
+        float circle_x = ParticleMotionScript.circle_bounds[0];
+        float circle_y = ParticleMotionScript.circle_bounds[1];
+        float circle_z = ParticleMotionScript.circle_bounds[2];
+        float circle_radius = ParticleMotionScript.circle_bounds[3];
+
+        Vector3 SpherePos = new Vector3(circle_x, circle_y, circle_z);
+        Vector3 SphereRadius = new Vector3(circle_radius, circle_radius, circle_radius);
+
+        sphere.transform.position = SpherePos;
+        sphere.transform.localScale = SphereRadius * 2;
+
+
+        if (ParticleMotionScript.bounds_is_circle)
+        {
+            sphere.SetActive(true);
+            Debug.Log("PositionSphere setActive(true");
+        }
+        else
+        {
+            sphere.SetActive(false);
+        }
+
+    }
+
+
+    void PostitionCube()
+    {
+        GameObject cube = GameObject.FindWithTag("bounds_cube");
+
+        float[] bounds = ParticleMotionScript.bounds;
+
+        float height = bounds[4];
+
+        Vector3 CubePos = new Vector3(0, height/2, 0);
+        Vector3 CubeScale = new Vector3(height, height, height);
+
+        cube.transform.position = CubePos;
+        cube.transform.localScale = CubeScale;
+
+        if (ParticleMotionScript.bounds_is_circle == false)
+        {
+            cube.SetActive(true);
+            Debug.Log("PostitionCube setActive(true");
+        }
+        else
+        {
+            cube.SetActive(false);
+        }
+    }
+
 
     // Update is called once per frame
     void Update () {
 		
+
+
 	}
 }

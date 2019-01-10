@@ -7,11 +7,11 @@ public class ParticleMotionScript : MonoBehaviour {
 	float[] particle_states;
 	float[] center;
     float[] gravity = { 0, -1.0f, 0 };
-    float[] bounds = { -10.0f, 0.0f, -10.0f, 10.0f, 20.0f, 10.0f };
+    public static float[] bounds = { -10.0f, 0.0f, -10.0f, 10.0f, 20.0f, 10.0f };
     float damping_percentage = 0.2f;
     public static bool bounds_is_circle = false;
 
-    float[] circle_bounds = { 0.0f, 8.0f, 0.0f, 8.0f };
+    public static float[] circle_bounds = { 0.0f, 8.0f, 0.0f, 8.0f };
 
     [DllImport("ParticlePlugin")]
     protected static extern void physicsStep(float[] particle_states, float[] gravity, float[] bounds, float damping_percentage, int attractors_count,  float[] attractor_data, float dt, bool bounds_is_circle);
@@ -31,6 +31,8 @@ public class ParticleMotionScript : MonoBehaviour {
         center[0] = 0;
         center[1] = 0;
         center[2] = particle_states[2];
+
+
 
        
     }

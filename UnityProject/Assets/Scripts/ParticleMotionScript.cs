@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 public class ParticleMotionScript : MonoBehaviour {
 	float[] particle_states;
 	float[] center;
-    float[] gravity = { 0, -1.0f, 0 };
+    float[] gravity = { 0, 0, 0 };
     public static float[] bounds = { -10.0f, 0.0f, -10.0f, 10.0f, 20.0f, 10.0f };
-    float damping_percentage = 0.2f;
-    public static bool bounds_is_circle = false;
+    public static float damping_percentage = 0.8f;
+    public static bool bounds_is_circle = true;
 
     public static float[] circle_bounds = { 0.0f, 8.0f, 0.0f, 8.0f };
 
@@ -23,18 +23,16 @@ public class ParticleMotionScript : MonoBehaviour {
 
 		////position
 		for(int d=0;d<3;d++) particle_states[d]=transform.position[d];
+
 		////velocity
 		particle_states[0 + 3] = UnityEngine.Random.Range(-3.0f, 3.0f);
         particle_states[1 + 3] = UnityEngine.Random.Range(-3.0f, 3.0f);
         particle_states[2 + 3] = UnityEngine.Random.Range(-3.0f, 3.0f);
+
         ////center
         center[0] = 0;
         center[1] = 0;
         center[2] = particle_states[2];
-
-
-
-       
     }
 	
 	void FixedUpdate () {
@@ -50,6 +48,7 @@ public class ParticleMotionScript : MonoBehaviour {
         }
 
         physicsStep(particle_states, gravity, local_bounds, damping_percentage, attractors_count, attractor_data, dt, bounds_is_circle);
+
 		transform.position = new Vector3 (particle_states[0],particle_states[1],particle_states[2]);
 
     }

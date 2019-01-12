@@ -1,5 +1,6 @@
 #define EXPORT_API
 #include <cmath>
+#include <iostream>
 
 extern "C"
 {
@@ -58,14 +59,6 @@ extern "C"
             a[d] += gravity[d];
         }
         
-        for(int d=0;d<3;d++){
-            v[d] += a[d] * dt;
-        }
-        
-        for(int d=0;d<3;d++){
-            x[d] += v[d] * dt;
-        }
-        
         if (bounds_is_circle) {
             
             float* bounds_circle = &bounds[0];
@@ -73,30 +66,63 @@ extern "C"
             float circle_x = bounds_circle[0];
             float circle_y = bounds_circle[1];
             float circle_z = bounds_circle[2];
-            
             float circle_r = bounds_circle[3];
             
             float dist_X = x[0] - circle_x;
             float dist_Y = x[1] - circle_y;
             float dist_Z = x[2] - circle_z;
             
-            float r_2 = dist_X * dist_X + dist_Y * dist_Y + dist_Z * dist_Z;
+            float r_2_before = dist_X * dist_X + dist_Y * dist_Y + dist_Z * dist_Z;
             
-            if (r_2 > circle_r * circle_r) {
-                //KROUSI
+            for(int d=0;d<3;d++){
+                v[d] += a[d] * dt;
+                x[d] += v[d] * dt;
+            }
+            
+            dist_X = x[0] - circle_x;
+            dist_Y = x[1] - circle_y;
+            dist_Z = x[2] - circle_z;
+            
+            float r_2_after = dist_X * dist_X + dist_Y * dist_Y + dist_Z * dist_Z;
+            
+            if (r_2_after > circle_r * circle_r) {
+                float r_before = std::sqrt(r_2_before);
+                float r_after = std::sqrt(r_2_after);
+                float r_difference = r_after - r_before;
+                if (r_difference < 0.01f) {
+                    r_difference = 0.01f;
+                }
+                float rewind_t = dt * (r_after - circle_r) / r_difference;
                 
-                double alpha = (v[0] * dist_X + v[1] * dist_Y + v[2] * dist_Z) / (dist_X * dist_X + dist_Y * dist_Y + dist_Z * dist_Z);
+                // peform the rewind
+                for(int d=0;d<3;d++){
+                    v[d] -= a[d] * rewind_t;
+                    x[d] -= v[d] * rewind_t;
+                }
                 
-                v[0] -= alpha * dist_X;
-                v[1] -= alpha * dist_Y;
-                v[2] -= alpha * dist_Z;
+                dist_X = x[0] - circle_x;
+                dist_Y = x[1] - circle_y;
+                dist_Z = x[2] - circle_z;
                 
-                v[0] -= (2 - damping_percentage) * alpha;
-                v[1] -= (2 - damping_percentage) * alpha;
-                v[2] -= (2 - damping_percentage) * alpha;
+                float force_magnitude = (2 - damping_percentage) * (v[0] * dist_X + v[1] * dist_Y + v[2] * dist_Z) / (circle_r * circle_r);
+                
+                v[0] -= force_magnitude * dist_X;
+                v[1] -= force_magnitude * dist_Y;
+                v[2] -= force_magnitude * dist_Z;
+                
+                // go forward in time (the time that was rewinded)
+                for(int d=0;d<3;d++){
+                    v[d] += a[d] * rewind_t;
+                    x[d] += v[d] * rewind_t;
+                }
             }
 
         } else {
+            
+            for(int d=0;d<3;d++){
+                v[d] += a[d] * dt;
+                x[d] += v[d] * dt;
+            }
             
             float* bounds_low = &bounds[0];
             float* bounds_high = &bounds[3];

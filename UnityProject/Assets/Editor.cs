@@ -14,6 +14,8 @@ public class MenuItems
     private static void NewMenuOption1()
     {
         SpawnerScript.attractors_count = 1;
+
+        GameObject spawner = GameObject.FindWithTag("spawner");
     }
 
     [MenuItem("Tools/2 Attractors Behaviour/size: 2")]
@@ -32,6 +34,7 @@ public class MenuItems
     private static void NewMenuOption4()
     {
         SpawnerScript.attractors_count = 4;
+
     }
 
     // Behaviour 3
@@ -58,5 +61,12 @@ public class MenuItems
             GameObject sphere = GameObject.FindWithTag("bounds_sphere");
             sphere.SetActive(false);
         }
+    }
+
+    [MenuItem("Tools/Spawn Bird")]
+    private static void NewMenuOption6()
+    {
+        GameObject spawner = GameObject.FindWithTag("spawner");
+        spawner.GetComponent<SpawnerScript>().SpawnBirds();
     }
 }

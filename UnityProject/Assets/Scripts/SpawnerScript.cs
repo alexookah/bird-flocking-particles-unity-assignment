@@ -39,6 +39,8 @@ public class SpawnerScript : MonoBehaviour {
 
         PostitionCube();
         PositionSphere();
+
+        SpawnBirds();
     }
 	
 	void Spawn ()
@@ -57,6 +59,7 @@ public class SpawnerScript : MonoBehaviour {
         Instantiate(object_prefabs[0], pos, transform.rotation);
 		number++;
     }
+
 
     void AttractorsSpawn()
     {
@@ -132,6 +135,35 @@ public class SpawnerScript : MonoBehaviour {
         {
             cube.SetActive(false);
         }
+    }
+
+    public void SpawnBirds()
+    {
+        float r = 2.0f;
+        float average_height = 10.0f;
+        for (int i = 0; i < 25; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                float x = i * 2.0f * r + Random.Range(-r, r);
+                float y = average_height;// + Random.Range(-r, r);
+                float z = j * 2.0f * r + Random.Range(-r, r);
+                Vector3 rotation = new Vector3(0, Random.Range(0.0f, 360.0f), 0);
+                SpawnBird(x, y, z, rotation);
+            }
+        }
+        GameObject[] all_birds = GameObject.FindGameObjectsWithTag("bird");
+        for (int i = 0; i < all_birds.Length; i++)
+        {
+            all_birds[i].GetComponent<BirdMotion>().UpdateAllBirds();
+        }
+    }
+
+
+    public void SpawnBird(float x, float y, float z, Vector3 rotation)
+    {
+        GameObject bird = Resources.Load<GameObject>("Prefabs/bird_prefab");
+        Instantiate(bird, new Vector3(x, y, z), Quaternion.Euler(rotation));
     }
 
 

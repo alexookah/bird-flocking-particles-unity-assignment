@@ -9,12 +9,18 @@ public class BirdMotion : MonoBehaviour
     private float[] force_total;
     private float[] force_to_neighbors;
     private float[] force_to_avoid_neighbors;
-    private float[] force_to_align_with_neigbors;
+    private Vector3 force_to_align_with_neigbors;
     private float[] all_distances;
     private Vector3 force_to_avoid_collision;
+    private Vector3 force_for_cohesion;
 
     private static float SCARY_SMALL_DISTANCE = 4.0f;
     private static float MAX_ACCELERATION = 10.0f;
+    private static float ALIGNMENT_VISIBILITY_RADIUS = 16.0f;
+    private static float SCARY_MISALIGNMENT_ANGLE_IN_DEG = 5.0f;
+    private static float COHESION_VISIBILITY_RADIUS = 100.0f;
+    private static float MAX_VELOCITY = 20.0f;
+    private static float MIN_VELOCITY_TO_CARE_ABOUT_ALIGNMENT = 2.0f;
     private GameObject closest_bird;
     
     private Vector3[] axial_distances_from_other_birds;
@@ -31,7 +37,8 @@ public class BirdMotion : MonoBehaviour
         force_total = new float[3];
         force_to_neighbors = new float[3];
         force_to_avoid_neighbors = new float[3];
-        force_to_align_with_neigbors = new float[3];
+        force_to_align_with_neigbors = new Vector3();
+        force_for_cohesion = new Vector3();
         for (int d = 0; d < 3; d++)
         {
             position[d] = transform.position[d];
@@ -97,6 +104,8 @@ public class BirdMotion : MonoBehaviour
         {
             force_total[d] = 0;
             force_to_avoid_collision[d] = 0;
+            force_to_align_with_neigbors[d] = 0;
+            force_for_cohesion[d] = 0;
             // TODO: add the others
         }
         //if my closest bird is too close, avoid it
@@ -104,6 +113,21 @@ public class BirdMotion : MonoBehaviour
         {
             return;
         }
+
+        //if I am too misaligned, align myself
+        if (AlignMyself())
+        {
+            return;
+        }
+        if (IAmLeader())
+        {
+
+        }
+        else
+        {
+            UpdateCohesionForce();
+        }
+
         // TODO: correctly implement the other forces
         /*
         // birds want to stay close to each other
@@ -141,14 +165,26 @@ public class BirdMotion : MonoBehaviour
         }*/
     }
 
+    private bool IAmLeader()
+    {
+        return false; //TODO
+    }
+
     private void UpdateVelocity()
     {
         Vector3 total_force = new Vector3(0, 0, 0);
         total_force += force_to_avoid_collision;
+        total_force += force_to_align_with_neigbors;
+        total_force += force_for_cohesion;
         // TODO: add others
 
         Vector3 delta_v = total_force * Time.deltaTime;
         velocity += delta_v;
+        float velocity_ratio = Vector3.Magnitude(velocity) / MAX_VELOCITY; // what percentage of max am I
+        if (velocity_ratio > 1)
+        {
+            velocity /= velocity_ratio;
+        }
 
         //for (int d = 0; d < 3; d++)
         //{
@@ -204,6 +240,104 @@ public class BirdMotion : MonoBehaviour
 
 
         return false;
+    }
+
+    private bool AlignMyself()
+    {
+        // find all birds within a certain radius
+        if (other_birds.Length == 0 || Vector3.Magnitude(velocity) < MIN_VELOCITY_TO_CARE_ABOUT_ALIGNMENT)
+        {
+            return false;
+        }
+        int nearby_birds_count = 0;
+        int[] nearby_bird_ids = new int[other_birds.Length];
+        for (int i = 0; i < other_birds.Length; i++)
+        {
+            if (all_distances[i] < ALIGNMENT_VISIBILITY_RADIUS)
+            {
+                nearby_bird_ids[nearby_birds_count] = i;
+                nearby_birds_count++;
+            }
+        }
+        // calculate the average velocity of these birds
+        Vector3 total_velocity = new Vector3(0, 0, 0);
+        for (int i = 0; i < nearby_birds_count; i++)
+        {
+            total_velocity += other_birds[i].GetComponent<BirdMotion>().velocity;
+        }
+        Vector3 normalized_total_velocity = Vector3.Normalize(total_velocity);
+        // calculate direction difference between this velocity and my velocity
+        float angle = Vector3.Angle(velocity, normalized_total_velocity);
+        // if the direction difference is too big, make a force to align myself
+        if (angle > SCARY_MISALIGNMENT_ANGLE_IN_DEG)
+        {
+            Vector3 velocity_difference = normalized_total_velocity - velocity;
+            force_to_align_with_neigbors = MAX_ACCELERATION * Vector3.Normalize(velocity_difference);
+            return true;
+        }
+
+        // TODO: make force to align but not the only force
+        return false;
+    }
+
+
+    private void UpdateCohesionForce()
+    {
+        // find all birds within a certain radius
+        if (other_birds.Length == 0)
+        {
+            return;
+        }
+        int nearby_birds_count = 0;
+        int[] nearby_bird_ids = new int[other_birds.Length];
+        for (int i = 0; i < other_birds.Length; i++)
+        {
+            if (all_distances[i] < COHESION_VISIBILITY_RADIUS)
+            {
+                nearby_bird_ids[nearby_birds_count] = i;
+                nearby_birds_count++;
+            }
+        }
+        // calculate the average position of these birds
+        Vector3 total_position = new Vector3(0, 0, 0);
+        for (int i = 0; i < nearby_birds_count; i++)
+        {
+            total_position += other_birds[nearby_bird_ids[i]].GetComponent<BirdMotion>().position;
+        }
+        Vector3 average_position = total_position / nearby_birds_count;
+        // find local birds (between me and the average position)
+        Vector3 local_sphere_center = 0.5f * (position + average_position);
+        float local_sphere_radius = 0.5f * Vector3.Magnitude(position - average_position);
+        int local_birds_count = 0;
+        int[] local_bird_ids = new int[other_birds.Length];
+        for (int i = 0; i < other_birds.Length; i++)
+        {
+            if (Vector3.Distance(local_sphere_center, other_birds[i].transform.position) < local_sphere_radius)
+            {
+                local_bird_ids[local_birds_count] = i;
+                local_birds_count++;
+            }
+        }
+        // find the average position of the local birds only
+        Vector3 local_total_position = new Vector3(0, 0, 0);
+        for (int i = 0; i < local_birds_count; i++)
+        {
+            local_total_position += other_birds[local_bird_ids[i]].GetComponent<BirdMotion>().position;
+        }
+        Vector3 local_average_position = local_total_position / local_birds_count;
+        // if local birds position is close to me, ok
+        float distance_from_local_center = Vector3.Distance(local_average_position, local_sphere_center);
+        float distance_from_global_center = Vector3.Distance(local_average_position, average_position);
+        if (distance_from_local_center < 0.5f * distance_from_global_center)
+        {
+            // all good, there are many birds between me and the global center
+            Vector3 pd = average_position - position;
+            force_for_cohesion = 0.1f * MAX_ACCELERATION * Vector3.Normalize(pd);
+            return;
+        }
+        // make a force towards this position
+        Vector3 position_difference = average_position - position;
+        force_for_cohesion = MAX_ACCELERATION * Vector3.Normalize(position_difference);
     }
 
     /*private void UpdateForceToNeighbors()

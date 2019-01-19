@@ -6,31 +6,36 @@ public class BirdMotion : MonoBehaviour
 {
     private Vector3 velocity;
     private Vector3 position;
-    private float[] force_total;
-    private float[] force_to_neighbors;
-    private float[] force_to_avoid_neighbors;
+    private Vector3 force_total;
     private Vector3 force_to_align_with_neigbors;
-    private float[] all_distances;
     private Vector3 force_to_avoid_collision;
     private Vector3 force_for_cohesion;
     private Vector3 force_of_leadership;
+    private Vector3 force_of_air_drag;
+    private Vector3 force_stay_in_the_map;
+    private float[] all_distances;
 
     private static float SCARY_SMALL_DISTANCE = 4.0f;
     private static float MAX_ACCELERATION = 10.0f;
     private static float ALIGNMENT_VISIBILITY_RADIUS = 16.0f;
     private static float SCARY_MISALIGNMENT_ANGLE_IN_DEG = 35.0f;
     private static float COHESION_VISIBILITY_RADIUS = 100.0f;
-    private static float MAX_VELOCITY = 20.0f;
     private static float MIN_VELOCITY_TO_CARE_ABOUT_ALIGNMENT = 2.0f;
+    private static float AIR_DRAG_COEFFICIENT = 0.05f;
+    private static float STAY_IN_THE_MAP_RADIUS_START = 180.0f;
+    private static float STAY_IN_THE_MAP_SCALE = 0.1f;
+
     private GameObject closest_bird;
 
+
     private static float LEADERSHIP_SCAN_RADIUS = 30.0f;
-    
+
     private Vector3[] axial_distances_from_other_birds;
     private GameObject[] other_birds;
 
     Animator m_Animator;
 
+    private bool animationIsFlyStay = true; //starting with animation: FlyStay
 
     // Start is called before the first frame update
     void Start()
@@ -39,12 +44,12 @@ public class BirdMotion : MonoBehaviour
 
         velocity = new Vector3();
         position = new Vector3();
-        force_total = new float[3];
-        force_to_neighbors = new float[3];
-        force_to_avoid_neighbors = new float[3];
+        force_total = new Vector3();
         force_to_align_with_neigbors = new Vector3();
         force_for_cohesion = new Vector3();
         force_of_leadership = new Vector3();
+        force_of_air_drag = new Vector3();
+        force_stay_in_the_map = new Vector3();
         for (int d = 0; d < 3; d++)
         {
             position[d] = transform.position[d];
@@ -56,7 +61,6 @@ public class BirdMotion : MonoBehaviour
 
         m_Animator = gameObject.GetComponent<Animator>();
 
-
     }
 
     // Update is called once per frame
@@ -67,33 +71,12 @@ public class BirdMotion : MonoBehaviour
         UpdateVelocity();
         UpdatePosition();
         UpdateTransform();
-        /*
-        float velocity_magnitude_squared = 0.0f;
-        for (int d = 0; d < 3; d++)
-        {
-            velocity[d] += force_total[d] * Time.deltaTime;
-            velocity_magnitude_squared += velocity[d] * velocity[d];
-        }
-        // don't let birds fly too fast
-        if (velocity_magnitude_squared > 30.0f)
-        {
-            for (int d = 0; d < 3; d++)
-            {
-                velocity[d] *= 30.0f / velocity_magnitude_squared;
-            }
-        }
-        // don't let birds fly too slow
-        if (velocity_magnitude_squared < 10.0f)
-        {
-            for (int d = 0; d < 3; d++)
-            {
-                velocity[d] *= 10.0f / velocity_magnitude_squared;
-            }
-        }
 
-        */
 
-        m_Animator.speed = (velocity.magnitude * 0.2f) + 0.9f;
+        UpdateAnimation();
+
+
+
     }
 
     public Vector3 GetVelocityDirection()
@@ -117,8 +100,10 @@ public class BirdMotion : MonoBehaviour
             force_to_align_with_neigbors[d] = 0;
             force_for_cohesion[d] = 0;
             force_of_leadership[d] = 0;
-            // TODO: add the others
+            force_of_air_drag[d] = 0;
+            force_stay_in_the_map[d] = 0;
         }
+
         //if my closest bird is too close, avoid it
         if (AvoidCollisions())
         {
@@ -139,41 +124,37 @@ public class BirdMotion : MonoBehaviour
             UpdateCohesionForce();
         }
 
-        // TODO: correctly implement the other forces
-        /*
-        // birds want to stay close to each other
-        UpdateForceToNeighbors();
-
-        // birds want to keep a minimum distance between neighbors
-        UpdateForceToAvoidNeighbors();
-
-        // birds want to be oriented similarly to their neighbors
-        UpdateForceToAlignWithNeighbors();
-
-        //
-
         // birds want to stay close to the center of the map
         // TODO
 
         // birds want to maintain a certain flight height
         // TODO
 
+        // Air drag
+        UpdateAirDragForce();
+        UpdateForceStayInTheMap();
+    }
 
+    private void UpdateAirDragForce()
+    {
+        force_of_air_drag = -velocity * velocity.magnitude * AIR_DRAG_COEFFICIENT;
+    }
 
-        float magnitude_squared = 0.0f;
-        for (int d = 0; d < 3; d++)
+    private void UpdateForceStayInTheMap()
+    {
+        if (position.magnitude < STAY_IN_THE_MAP_RADIUS_START)
         {
-            magnitude_squared += force_total[d] * force_total[d];
+            return;
         }
-        // don't let birds accelerate too much
-        float threshold = 10.01f;
-        if (magnitude_squared > threshold)
+        else
         {
-            for (int d = 0; d < 3; d++)
-            {
-                force_total[d] *= threshold / magnitude_squared;
-            }
-        }*/
+            float distanceFromMinRadius = position.magnitude - STAY_IN_THE_MAP_RADIUS_START;
+            float force_magnitude = distanceFromMinRadius * STAY_IN_THE_MAP_SCALE;
+            Vector3 forceDirection = Vector3.Cross(position, new Vector3(0, 1, 0)).normalized;
+            force_stay_in_the_map = forceDirection * force_magnitude;
+        }
+
+
     }
 
     private bool IAmLeader()
@@ -224,40 +205,55 @@ public class BirdMotion : MonoBehaviour
         return true;
     }
 
+
     private void UpdateLeadershipForce()
     {
         force_of_leadership = velocity.normalized * MAX_ACCELERATION * 0.5f;
     }
 
+
     private void UpdateVelocity()
     {
-        Vector3 total_force = new Vector3(0, 0, 0);
-        total_force += force_to_avoid_collision;
-        total_force += force_to_align_with_neigbors;
-        total_force += force_for_cohesion;
-        total_force += force_of_leadership;
-        // TODO: add others
+        force_total += force_to_avoid_collision;
+        force_total += force_to_align_with_neigbors;
+        force_total += force_for_cohesion;
+        force_total += force_of_leadership;
+        force_total += force_of_air_drag;
+        force_total += force_stay_in_the_map;
 
-        Vector3 delta_v = total_force * Time.deltaTime;
-        velocity += delta_v;
-        float velocity_ratio = Vector3.Magnitude(velocity) / MAX_VELOCITY; // what percentage of max am I
-        if (velocity_ratio > 1)
-        {
-            velocity /= velocity_ratio;
-        }
-
-        //for (int d = 0; d < 3; d++)
-        //{
-        //    force_total[d] += force_to_neighbors[d];
-        //    force_total[d] += force_to_avoid_neighbors[d];
-        //    force_total[d] += force_to_align_with_neigbors[d];
-        //}
+        Vector3 delta_v = force_total * Time.deltaTime;
+        velocity += delta_v;         
     }
+
 
     private void UpdatePosition()
     {
         position += velocity * Time.deltaTime;
     }
+
+
+    private void UpdateAnimation()
+    {
+        bool animationShouldBeFly = force_total.magnitude > 1; //0.001f * MAX_ACCELERATION;
+
+        if (animationIsFlyStay && animationShouldBeFly)
+        {
+            //Debug.Log("FLY");
+            m_Animator.SetTrigger("Fly");
+            animationIsFlyStay = false;
+
+        } else if (!animationIsFlyStay && !animationShouldBeFly)
+        {
+            //Debug.Log("FLYSTAY");
+            m_Animator.SetTrigger("FlyStay");
+            animationIsFlyStay = true;
+        }
+
+        //Update Speed
+        m_Animator.speed = (velocity.magnitude * 0.2f) + 0.9f;
+
+    }
+
 
     private void UpdateTransform()
     {
@@ -265,6 +261,7 @@ public class BirdMotion : MonoBehaviour
         float angle_y =  Mathf.Rad2Deg * Mathf.Atan2(velocity[0], velocity[2]);
         transform.rotation = Quaternion.Euler(0, angle_y, 0);
     }
+
 
     private bool AvoidCollisions()
     {
@@ -298,9 +295,9 @@ public class BirdMotion : MonoBehaviour
             return true;
         }
 
-
         return false;
     }
+
 
     private bool AlignMyself()
     {
@@ -400,78 +397,6 @@ public class BirdMotion : MonoBehaviour
         Vector3 position_difference = average_position - position;
         force_for_cohesion = MAX_ACCELERATION * Vector3.Normalize(position_difference);
     }
-
-    /*private void UpdateForceToNeighbors()
-    {
-        for (int d = 0; d < 3; d++)
-        {
-            force_to_neighbors[d] = 0;
-        }
-
-        for (int i = 0; i < all_birds.Length; i++)
-        {
-            for (int d = 0; d < 3; d++)
-            {
-                force_to_neighbors[d] += -1.0f * all_distances_in_axis[i][d] / (all_distances[i] * all_distances[i]);
-            }
-        }
-    }
-
-    public void UpdateForceToAvoidNeighbors()
-    {
-        for (int d = 0; d < 3; d++)
-        {
-            force_to_avoid_neighbors[d] = 0;
-        }
-
-        for (int i = 0; i < all_birds.Length; i++)
-        {
-
-            if (all_distances[i] > 15.0f)
-            {
-                // ignore distant birds
-                continue;
-            }
-            for (int d = 0; d < 3; d++)
-            {
-                force_to_avoid_neighbors[d] += 100.0f * all_distances_in_axis[i][d] / (all_distances[i] * all_distances[i]);
-            }
-        }
-    }
-
-    private void UpdateForceToAlignWithNeighbors()
-    {
-        for (int d = 0; d < 3; d++)
-        {
-            force_to_align_with_neigbors[d] = 0;
-        }
-
-        for (int i = 0; i < all_birds.Length; i++)
-        {
-
-            if (all_distances[i] > 30.0f)
-            {
-                // ignore distant birds and include a little more nearby birds
-                continue;
-            }
-            Vector3 other_bird_velocity_direction = all_birds[i].GetComponent<BirdMotion>().GetVelocityDirection();
-            for (int d = 0; d < 3; d++)
-            {
-                force_to_align_with_neigbors[d] += other_bird_velocity_direction[d]; // include generally nearby birds without taking distance into account
-            }
-            // normalization
-            float magnitude_squared = 0.0f;
-            for (int d = 0; d < 3; d++)
-            {
-                magnitude_squared += force_to_align_with_neigbors[d] * force_to_align_with_neigbors[d];
-            }
-            float magnitude = Mathf.Sqrt(magnitude_squared);
-            for (int d = 0; d < 3; d++)
-            {
-                force_to_align_with_neigbors[d] = 300.0f * force_to_align_with_neigbors[d] / magnitude;
-            }
-        }
-    }*/
 
     // This function lets THIS bird know which are the other birds
     public void UpdateAllBirds()

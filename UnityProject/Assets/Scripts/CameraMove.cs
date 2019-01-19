@@ -86,7 +86,6 @@ public class CameraMove : MonoBehaviour
     void UpdateMessageAndDissapear()
     {
         displayTime -= Time.deltaTime;
-        Debug.Log(displayTime);
         if (displayTime <= 0.0f)
         {
             displayMessage = false;

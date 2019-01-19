@@ -21,6 +21,9 @@ public class SpawnerScript : MonoBehaviour {
     private GameObject[] object_attractors_prefabs;       // Array of attractor prefabs.
     private int number_of_attractors_initialized;
 
+    public GameObject sphere;
+    public GameObject cube;
+
     // Use this for initialization
     void Start () {
 		object_prefabs = new GameObject[1];
@@ -50,7 +53,7 @@ public class SpawnerScript : MonoBehaviour {
 		transform.position = new Vector3(0.0f, 0.0f, 0.0f);
 
 		float r = 0.0f;
-        float spawnerHeight = 10.0f;
+        float spawnerHeight = 30.0f;
 		float x_perturb = Random.Range (-r, r);
 		float y_perturb = Random.Range (-r, r);
 		float z_perturb = Random.Range (-r, r);
@@ -85,7 +88,7 @@ public class SpawnerScript : MonoBehaviour {
 
     void PositionSphere()
     {
-        GameObject sphere = GameObject.FindWithTag("bounds_sphere");
+        sphere = GameObject.FindWithTag("bounds_sphere");
 
         float circle_x = ParticleMotionScript.circle_bounds[0];
         float circle_y = ParticleMotionScript.circle_bounds[1];
@@ -102,7 +105,6 @@ public class SpawnerScript : MonoBehaviour {
         if (ParticleMotionScript.bounds_is_circle)
         {
             sphere.SetActive(true);
-            Debug.Log("PositionSphere setActive(true");
         }
         else
         {
@@ -114,7 +116,7 @@ public class SpawnerScript : MonoBehaviour {
 
     void PostitionCube()
     {
-        GameObject cube = GameObject.FindWithTag("bounds_cube");
+        cube = GameObject.FindWithTag("bounds_cube");
 
         float[] bounds = ParticleMotionScript.bounds;
 
@@ -129,7 +131,6 @@ public class SpawnerScript : MonoBehaviour {
         if (ParticleMotionScript.bounds_is_circle == false)
         {
             cube.SetActive(true);
-            Debug.Log("PostitionCube setActive(true");
         }
         else
         {
@@ -140,12 +141,12 @@ public class SpawnerScript : MonoBehaviour {
     public void SpawnBirds()
     {
         float r = 2.0f;
-        float average_height = 10.0f;
+        float average_height = 20.0f;
         for (int i = 0; i < 25; i++)
         {
             for (int j = 0; j < 10; j++)
             {
-                float x = i * 2.0f * r + Random.Range(-r, r);
+                float x = i * 20.0f * r + Random.Range(-r, r);
                 float y = average_height;// + Random.Range(-r, r);
                 float z = j * 2.0f * r + Random.Range(-r, r);
                 Vector3 rotation = new Vector3(0, Random.Range(0.0f, 360.0f), 0);

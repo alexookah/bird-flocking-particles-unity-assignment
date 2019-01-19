@@ -60,9 +60,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\BirdMotion.cs" />
-    <Compile Include="Assets\Editor.cs" />
     <Compile Include="Assets\Scripts\AttractorPosition.cs" />
+    <Compile Include="Assets\Scripts\BirdMotion.cs" />
+    <Compile Include="Assets\Scripts\Editor.cs" />
     <Compile Include="Assets\Scripts\ParticleMotionScript.cs" />
     <Compile Include="Assets\Scripts\SpawnerScript.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">

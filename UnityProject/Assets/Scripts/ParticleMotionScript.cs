@@ -13,7 +13,7 @@ public class ParticleMotionScript : MonoBehaviour {
     float[] gravity = { 0, -2.0f, 0 };
     public static float[] bounds = { -10.0f, 0.0f, -10.0f, 10.0f, 20.0f, 10.0f };
     public static float damping_percentage = 0.2f;
-    public static bool bounds_is_circle = true;
+    public static bool bounds_is_circle = false;
 
     public static float[] circle_bounds = { 0.0f, 8.0f, 0.0f, 8.0f };
 
@@ -65,7 +65,6 @@ public class ParticleMotionScript : MonoBehaviour {
             for (int d = 0; d < 3; d++)
             {
                 all_particles_data[4 * i + d] = all_particles[i].transform.position[d];
-                //Debug.Log()
             }
             all_particles_data[4 * i + 3] = -10.0f;
         }

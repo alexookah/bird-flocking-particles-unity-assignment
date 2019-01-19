@@ -13,15 +13,18 @@ public class BirdMotion : MonoBehaviour
     private float[] all_distances;
     private Vector3 force_to_avoid_collision;
     private Vector3 force_for_cohesion;
+    private Vector3 force_of_leadership;
 
     private static float SCARY_SMALL_DISTANCE = 4.0f;
     private static float MAX_ACCELERATION = 10.0f;
     private static float ALIGNMENT_VISIBILITY_RADIUS = 16.0f;
-    private static float SCARY_MISALIGNMENT_ANGLE_IN_DEG = 5.0f;
+    private static float SCARY_MISALIGNMENT_ANGLE_IN_DEG = 35.0f;
     private static float COHESION_VISIBILITY_RADIUS = 100.0f;
     private static float MAX_VELOCITY = 20.0f;
     private static float MIN_VELOCITY_TO_CARE_ABOUT_ALIGNMENT = 2.0f;
     private GameObject closest_bird;
+
+    private static float LEADERSHIP_SCAN_RADIUS = 30.0f;
     
     private Vector3[] axial_distances_from_other_birds;
     private GameObject[] other_birds;
@@ -41,6 +44,7 @@ public class BirdMotion : MonoBehaviour
         force_to_avoid_neighbors = new float[3];
         force_to_align_with_neigbors = new Vector3();
         force_for_cohesion = new Vector3();
+        force_of_leadership = new Vector3();
         for (int d = 0; d < 3; d++)
         {
             position[d] = transform.position[d];
@@ -89,7 +93,7 @@ public class BirdMotion : MonoBehaviour
 
         */
 
-        m_Animator.speed = (velocity.magnitude * 0.4f) + 0.8f;
+        m_Animator.speed = (velocity.magnitude * 0.2f) + 0.9f;
     }
 
     public Vector3 GetVelocityDirection()
@@ -112,6 +116,7 @@ public class BirdMotion : MonoBehaviour
             force_to_avoid_collision[d] = 0;
             force_to_align_with_neigbors[d] = 0;
             force_for_cohesion[d] = 0;
+            force_of_leadership[d] = 0;
             // TODO: add the others
         }
         //if my closest bird is too close, avoid it
@@ -127,7 +132,7 @@ public class BirdMotion : MonoBehaviour
         }
         if (IAmLeader())
         {
-
+            UpdateLeadershipForce();
         }
         else
         {
@@ -173,7 +178,55 @@ public class BirdMotion : MonoBehaviour
 
     private bool IAmLeader()
     {
-        return false; //TODO
+        // find birds in LEADERSHIP_SCAN_RADIUS radius
+        int nearby_birds_count = 0;
+        int[] nearby_bird_ids = new int[other_birds.Length];
+        for (int i = 0; i < other_birds.Length; i++)
+        {
+            if (all_distances[i] < LEADERSHIP_SCAN_RADIUS)
+            {
+                nearby_bird_ids[nearby_birds_count] = i;
+                nearby_birds_count++;
+            }
+        }
+        // too few birds to be a leader
+        if (nearby_birds_count < 10)
+        {
+            return false;
+        }
+
+        // Check if nearby birds are behind me
+        for (int i = 0; i < nearby_birds_count; i++)
+        {
+            Vector3 other_bird_position = other_birds[nearby_bird_ids[i]].GetComponent<BirdMotion>().position;
+
+            bool is_behind_me = Vector3.Dot(velocity, other_bird_position - position) > 0;
+            if (!is_behind_me)
+            {
+                return false;
+            }
+        }
+
+        // Check if nearby birds are moving towards me
+        Vector3 other_birds_total_velocity = new Vector3();
+        for (int i = 0; i < nearby_birds_count; i++)
+        {
+            other_birds_total_velocity += other_birds[nearby_bird_ids[i]].GetComponent<BirdMotion>().velocity;
+        }
+        Vector3 other_birds_average_velocity = other_birds_total_velocity / nearby_birds_count;
+        float leadership_pushing_threshold = 0.0f;
+        bool other_birds_are_pushing = Vector3.Dot(velocity, other_birds_average_velocity) > leadership_pushing_threshold;
+        if (!other_birds_are_pushing)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void UpdateLeadershipForce()
+    {
+        force_of_leadership = velocity.normalized * MAX_ACCELERATION * 0.5f;
     }
 
     private void UpdateVelocity()
@@ -182,6 +235,7 @@ public class BirdMotion : MonoBehaviour
         total_force += force_to_avoid_collision;
         total_force += force_to_align_with_neigbors;
         total_force += force_for_cohesion;
+        total_force += force_of_leadership;
         // TODO: add others
 
         Vector3 delta_v = total_force * Time.deltaTime;
@@ -282,7 +336,8 @@ public class BirdMotion : MonoBehaviour
             return true;
         }
 
-        // TODO: make force to align but not the only force
+        force_to_align_with_neigbors = normalized_total_velocity * MAX_ACCELERATION * 0.6f;
+
         return false;
     }
 

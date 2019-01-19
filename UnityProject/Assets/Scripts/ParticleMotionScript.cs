@@ -14,6 +14,7 @@ public class ParticleMotionScript : MonoBehaviour {
     public static float[] bounds = { -10.0f, 0.0f, -10.0f, 10.0f, 20.0f, 10.0f };
     public static float damping_percentage = 0.2f;
     public static bool bounds_is_circle = false;
+    public static bool repulsionIsEnabled = false;
 
     public static float[] circle_bounds = { 0.0f, 8.0f, 0.0f, 8.0f };
 
@@ -69,6 +70,11 @@ public class ParticleMotionScript : MonoBehaviour {
             all_particles_data[4 * i + 3] = -10.0f;
         }
 
+        if (!repulsionIsEnabled)
+        {
+            //to disable repulsion in physics Step
+            particles_count = 0;
+        }
 
         physicsStep(particle_states, all_particles_data, particles_count, gravity, local_bounds, damping_percentage, attractors_count, attractor_data, dt, bounds_is_circle);
 

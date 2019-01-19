@@ -44,16 +44,22 @@ public class MenuItems
         CheckBehaviour();
     }
 
+    [MenuItem("Tools/Toggle Repulsion")]
+    private static void NewMenuOption5()
+    {
+        ParticleMotionScript.repulsionIsEnabled = !ParticleMotionScript.repulsionIsEnabled;
+    }
+
     // Behaviour 3
     [MenuItem("Tools/Toggle Bounds is Circle")]
-    private static void NewMenuOption5()
+    private static void NewMenuOption6()
     {
         ToggleCircle();
         SpawnerScript.attractors_count = 0;
     }
 
     [MenuItem("Tools/Spawn Birds")]
-    private static void NewMenuOption6()
+    private static void NewMenuOption7()
     {
         GameObject spawner = GameObject.FindWithTag("spawner");
         spawner.GetComponent<SpawnerScript>().SpawnBirds();

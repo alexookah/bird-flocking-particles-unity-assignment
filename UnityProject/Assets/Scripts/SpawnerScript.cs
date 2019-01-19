@@ -142,11 +142,11 @@ public class SpawnerScript : MonoBehaviour {
     {
         float r = 2.0f;
         float average_height = 20.0f;
-        for (int i = 0; i < 25; i++)
+        for (int i = 0; i < 4; i++)
         {
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < 25; j++)
             {
-                float x = i * 20.0f * r + Random.Range(-r, r);
+                float x = i * 26.0f * r + Random.Range(-r, r);
                 float y = average_height;// + Random.Range(-r, r);
                 float z = j * 2.0f * r + Random.Range(-r, r);
                 Vector3 rotation = new Vector3(0, Random.Range(0.0f, 360.0f), 0);

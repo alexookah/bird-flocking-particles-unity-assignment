@@ -6,11 +6,11 @@ using UnityEngine.UI;
 public class CameraMove : MonoBehaviour
 {
     // Start is called before the first frame update
-    private float speed = 10.0f;
+    private float speed = 50.0f;
 
 
-    public float speedH = 30.0f;
-    public float speedV = 30.0f;
+    public float speedH = 5.0f;
+    public float speedV = 5.0f;
 
     private float yaw = 0.0f;
     private float pitch = 0.0f;
@@ -65,6 +65,7 @@ public class CameraMove : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
         {
             movingByMouse = !movingByMouse;
+            SetMessage("Mouse Camera is: " + movingByMouse);
             ShowMessage();
         }
 
@@ -77,10 +78,15 @@ public class CameraMove : MonoBehaviour
 
     }
 
-    void ShowMessage()
+    public void ShowMessage()
     {
         displayTime = 3.0f;
-        message = "Mouse Camera is: " + movingByMouse;
+
+    }
+
+    public void SetMessage(string msg)
+    {
+        message = msg;
     }
 
     void UpdateMessageAndDissapear()

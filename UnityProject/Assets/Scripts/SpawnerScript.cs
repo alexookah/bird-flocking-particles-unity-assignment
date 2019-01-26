@@ -5,12 +5,10 @@ public class SpawnerScript : MonoBehaviour {
 	public float spawnTime = 3f;		// The amount of time between each spawn.
 	public float spawnDelay = 0f;		// The amount of time before spawning starts.
 	
-	public float max_num_particles = 100;
+	public float max_num_particles = 60;
 	
 	private GameObject [] object_prefabs;		// Array of prefabs.
 	private int number;
-
-
 
     public static int attractors_count = 0;
     public static float[] attractor_data =   { 0, 2.0f, 0, -10.0f, //attractor: 1
@@ -18,6 +16,8 @@ public class SpawnerScript : MonoBehaviour {
                                                0, 8.0f, -8.0f, -10.0f, //attractor: 3
                                                0, 16.0f, 00, -10.0f, //attractor: 4
                                                };
+    private static float ballRadius = 0.5f;
+
     private GameObject[] object_attractors_prefabs;       // Array of attractor prefabs.
     private int number_of_attractors_initialized;
 
@@ -53,7 +53,7 @@ public class SpawnerScript : MonoBehaviour {
 		transform.position = new Vector3(0.0f, 0.0f, 0.0f);
 
 		float r = 0.0f;
-        float spawnerHeight = 30.0f;
+        float spawnerHeight = ParticleMotionScript.bounds_is_circle ? 15.0f : 20.0f;
 		float x_perturb = Random.Range (-r, r);
 		float y_perturb = Random.Range (-r, r);
 		float z_perturb = Random.Range (-r, r);
@@ -96,7 +96,7 @@ public class SpawnerScript : MonoBehaviour {
         float circle_radius = ParticleMotionScript.circle_bounds[3];
 
         Vector3 SpherePos = new Vector3(circle_x, circle_y, circle_z);
-        Vector3 SphereRadius = new Vector3(circle_radius, circle_radius, circle_radius);
+        Vector3 SphereRadius = new Vector3(circle_radius + ballRadius * 2, circle_radius + ballRadius * 2, circle_radius + ballRadius * 2);
 
         sphere.transform.position = SpherePos;
         sphere.transform.localScale = SphereRadius * 2;
@@ -123,7 +123,7 @@ public class SpawnerScript : MonoBehaviour {
         float height = bounds[4];
 
         Vector3 CubePos = new Vector3(0, height/2, 0);
-        Vector3 CubeScale = new Vector3(height, height, height);
+        Vector3 CubeScale = new Vector3(height + ballRadius * 2, height + ballRadius * 2, height + ballRadius * 2);
 
         cube.transform.position = CubePos;
         cube.transform.localScale = CubeScale;
@@ -141,13 +141,13 @@ public class SpawnerScript : MonoBehaviour {
     public void SpawnBirds()
     {
         float r = 2.0f;
-        float average_height = 20.0f;
-        for (int i = 0; i < 4; i++)
+        float average_height = 40.0f;
+        for (int i = 0; i < 2; i++)
         {
-            for (int j = 0; j < 25; j++)
+            for (int j = 0; j < 20; j++)
             {
                 float x = i * 26.0f * r + Random.Range(-r, r);
-                float y = average_height;// + Random.Range(-r, r);
+                float y = average_height + Random.Range(-r, r);
                 float z = j * 2.0f * r + Random.Range(-r, r);
                 Vector3 rotation = new Vector3(0, Random.Range(0.0f, 360.0f), 0);
                 SpawnBird(x, y, z, rotation);

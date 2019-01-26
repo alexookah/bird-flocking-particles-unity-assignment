@@ -22,7 +22,7 @@ public class BirdMotion : MonoBehaviour
     private static float COHESION_VISIBILITY_RADIUS = 100.0f;
     private static float MIN_VELOCITY_TO_CARE_ABOUT_ALIGNMENT = 2.0f;
     private static float AIR_DRAG_COEFFICIENT = 0.05f;
-    private static float STAY_IN_THE_MAP_RADIUS_START = 180.0f;
+    private static float STAY_IN_THE_MAP_RADIUS_START = 100.0f;
     private static float STAY_IN_THE_MAP_SCALE = 0.1f;
 
     private GameObject closest_bird;
@@ -124,11 +124,9 @@ public class BirdMotion : MonoBehaviour
             UpdateCohesionForce();
         }
 
-        // birds want to stay close to the center of the map
-        // TODO
-
         // birds want to maintain a certain flight height
         // TODO
+
 
         // Air drag
         UpdateAirDragForce();
@@ -290,7 +288,7 @@ public class BirdMotion : MonoBehaviour
         if (minimum_distance < SCARY_SMALL_DISTANCE)
         {
             // avoid the obstacle at all costs
-            Vector3 vector_distance = transform.position - other_birds[closest_bird_index].transform.position;
+            Vector3 vector_distance = transform.position - position_to_avoid;
             force_to_avoid_collision = MAX_ACCELERATION * vector_distance / minimum_distance;
             return true;
         }
@@ -320,7 +318,7 @@ public class BirdMotion : MonoBehaviour
         Vector3 total_velocity = new Vector3(0, 0, 0);
         for (int i = 0; i < nearby_birds_count; i++)
         {
-            total_velocity += other_birds[i].GetComponent<BirdMotion>().velocity;
+            total_velocity += other_birds[nearby_bird_ids[i]].GetComponent<BirdMotion>().velocity;
         }
         Vector3 normalized_total_velocity = Vector3.Normalize(total_velocity);
         // calculate direction difference between this velocity and my velocity

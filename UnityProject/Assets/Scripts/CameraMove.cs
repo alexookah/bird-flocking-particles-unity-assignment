@@ -23,6 +23,15 @@ public class CameraMove : MonoBehaviour
 
     private float displayTime = 3.0f;
 
+    public bool isLeftButtonPressed = false;
+    public bool isRightButtonPressed = false;
+    public bool isDownButtonPressed = false;
+    public bool isUpButtonPressed = false;
+
+    public bool isSpaceButtonPressed = false;
+    public bool isShiftButtonPressed = false;
+
+
     void Start()
     {
 
@@ -33,40 +42,39 @@ public class CameraMove : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            transform.Translate(new Vector3(speed * Time.deltaTime, 0, 0));
+            MoveRight();
         }
+
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            transform.Translate(new Vector3(-speed * Time.deltaTime, 0, 0));
+            MoveLeft();
         }
+
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            transform.Translate(new Vector3(0, -speed * Time.deltaTime, 0));
+            MoveDown();
         }
+
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            transform.Translate(new Vector3(0, speed * Time.deltaTime, 0));
+            MoveUp();
         }
 
 
         if (Input.GetKey(KeyCode.Space))
         {
-            transform.Translate(new Vector3(0, 0, speed * Time.deltaTime));
-
+            MoveForward();
         }
 
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
-            transform.Translate(new Vector3(0, 0, -speed * Time.deltaTime));
-
+            MoveBack();
         }
 
 
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
         {
-            movingByMouse = !movingByMouse;
-            SetMessage("Mouse Camera is: " + movingByMouse);
-            ShowMessage();
+            UnlockCameraMouse();
         }
 
         UpdateMessageAndDissapear();
@@ -76,6 +84,139 @@ public class CameraMove : MonoBehaviour
             MoveCameraByMouse();
         }
 
+        if (isLeftButtonPressed)
+        {
+            MoveLeft();
+        }
+
+        if (isRightButtonPressed)
+        {
+            MoveRight();
+        }
+
+        if (isUpButtonPressed)
+        {
+            MoveUp();
+        }
+
+        if (isDownButtonPressed)
+        {
+            MoveDown();
+        }
+
+        if (isSpaceButtonPressed)
+        {
+            MoveForward();
+        }
+
+        if (isShiftButtonPressed)
+        {
+            MoveBack();
+        }
+    }
+
+    //LEFT
+    public void onPressLeft()
+    {
+        isLeftButtonPressed = true;
+    }
+
+    public void onReleaseLeft()
+    {
+        isLeftButtonPressed = false;
+    }
+
+    //RIGHT
+    public void onPressRight()
+    {
+        isRightButtonPressed = true;
+    }
+
+    public void onReleaseRight()
+    {
+        isRightButtonPressed = false;
+    }
+
+    //DOWN
+    public void onPressDown()
+    {
+        isDownButtonPressed = true;
+    }
+
+    public void onReleaseDown()
+    {
+        isDownButtonPressed = false;
+    }
+
+    //UP
+    public void onPressUp()
+    {
+        isUpButtonPressed = true;
+    }
+
+    public void onReleaseUp()
+    {
+        isUpButtonPressed = false;
+    }
+
+    //SPACE
+    public void onPressSpace()
+    {
+        isSpaceButtonPressed = true;
+    }
+
+    public void onReleaseSpace()
+    {
+        isSpaceButtonPressed = false;
+    }
+
+    //SHIFT
+    public void onPressShift()
+    {
+        isShiftButtonPressed = true;
+    }
+
+    public void onReleaseShift()
+    {
+        isShiftButtonPressed = false;
+    }
+
+
+    public void MoveRight() 
+    {
+        transform.Translate(new Vector3(speed * Time.deltaTime, 0, 0));
+    }
+
+    public void MoveLeft()
+    {
+        transform.Translate(new Vector3(-speed * Time.deltaTime, 0, 0));
+    }
+
+    public void MoveUp()
+    {
+        transform.Translate(new Vector3(0, speed * Time.deltaTime, 0));
+    }
+
+    public void MoveDown()
+    {
+        transform.Translate(new Vector3(0, -speed * Time.deltaTime, 0));
+    }
+
+    public void MoveForward()
+    {
+        transform.Translate(new Vector3(0, 0, speed * Time.deltaTime));
+    }
+
+    public void MoveBack()
+    {
+        transform.Translate(new Vector3(0, 0, -speed * Time.deltaTime));
+    }
+
+    public void UnlockCameraMouse()
+    {
+        movingByMouse = !movingByMouse;
+        SetMessage("Mouse Camera is: " + movingByMouse);
+        ShowMessage();
     }
 
     public void ShowMessage()

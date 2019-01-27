@@ -40,35 +40,43 @@ public class CameraMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            MoveRight();
-        }
 
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            MoveLeft();
-        }
-
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            MoveDown();
-        }
-
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            MoveUp();
-        }
-
-
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
         {
             MoveForward();
         }
 
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
             MoveBack();
+        }
+
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
+        {
+            MoveLeft();
+        }
+
+
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D) )
+        {
+            MoveRight();
+        }
+
+
+
+
+
+
+
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            MoveUp();
+        }
+
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        {
+            MoveDown();
         }
 
 
@@ -96,22 +104,22 @@ public class CameraMove : MonoBehaviour
 
         if (isUpButtonPressed)
         {
-            MoveUp();
+            MoveForward();
         }
 
         if (isDownButtonPressed)
         {
-            MoveDown();
+            MoveBack();
         }
 
         if (isSpaceButtonPressed)
         {
-            MoveForward();
+            MoveUp();
         }
 
         if (isShiftButtonPressed)
         {
-            MoveBack();
+            MoveDown();
         }
     }
 

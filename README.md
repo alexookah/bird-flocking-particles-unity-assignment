@@ -3,7 +3,8 @@ A University assignment created with Unity, including physics for bird of flocks
 
 
 # Demo Links:
-[Web:] (https://flocking-particles-unity.web.app/)
+[I'm an inline-style link](https://www.google.com)
+[Web] (https://flocking-particles-unity.web.app)
 
 [Download for Windows](https://github.com/Alexookah/bird-flocking-particles-unity-assignment/blob/master/build_platforms/mac_particles_assignment.zip?raw=true)
 
